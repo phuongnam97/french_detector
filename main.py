@@ -1,11 +1,18 @@
 import re
 import unicodedata
+import docx2txt
+import antiword
 
 # importing sys
 import sys
 # adding Folder_2/subfolder to the system path
 sys.path.insert(0, 'controller')
 from dictionnary import check_exist_word 
+
+def remove_numbers(text):
+  """Removes all numbers from a string."""
+  numbers = set(range(10))
+  return ''.join(ch for ch in text if ch not in numbers)
 
 def check_unexist_french_word(paragraph):
     words = convert_french_paper_content_to_list_of_words(paragraph)
@@ -30,7 +37,9 @@ def convert_french_paper_content_to_list_of_words(paper_content):
   """
 
   # Remove all punctuation from the paper content.
-  newStr = paper_content.replace("l'", "").replace("\n", " ")
+  newStr = paper_content.replace("l'", "").replace("n'", "").replace("d'", "").replace("c'", "").replace("l’", "").replace("n’", "").replace("d’", "").replace("c’", "").replace("\n", " ")
+  newStr = detect_and_remove_uppercase_words(newStr)
+  print(newStr)
   paper_content = re.sub(r"[^\w\s]", "", newStr)
 
   # Convert the paper content to lowercase.
@@ -47,11 +56,54 @@ def convert_french_paper_content_to_list_of_words(paper_content):
   # Return the list of words.
   return words
 
+def detect_and_remove_uppercase_words(text):
+  """Detects and removes all uppercase words in a string text if the word is in the phrase, not the beginning word of the phrase."""
+  pattern = r'\b[A-Z]+\b'
+  words = re.findall(pattern, text)
+  for word in words:
+    if word != text[0]:
+      text = text.replace(word, '')
+  return text
+
+
 # word = "oller"
 # print("Result: " + ("Exist word: " + word if check_exist_word(word) else "Not Exist word: " + word ))
-content = """Ceci est un article sur l'utilisation de Python pour le traitement du langage naturel.
-  Python est un langage puissant qui peut être utilisé pour une variété de tâches NLP,
-  telles que la classification de texte, l'analyse de sentiment et la traduction automatique.
-  Dans cet article, nous discuterons de la façon dont Python peut être utilisé pour implémenter ces tâches.
-  Nous fournirons également des exemples de code Python qui peuvent être utilisés pour NLP."""
-print(check_unexist_french_word(content))
+# content = """Ceci est un article sur l'utilisation de Python pour le traitement du langage naturel.
+#   Python est un langage puissant qui peut être utilisé pour une variété de tâches NLP,
+#   telles que la classification de texte, l'analyse de sentiment et la traduction automatique.
+#   Dans cet article, nous discuterons de la façon dont Python peut être utilisé pour implémenter ces tâches.
+#   Nous fournirons également des exemples de code Python qui peuvent être utilisés pour NLP."""
+# print(check_unexist_french_word(content))
+
+def get_file_extension(filename):
+  """Gets the file extension of a file."""
+  last_dot_index = filename.rfind('.')
+  if last_dot_index == -1:
+    return None
+  else:
+    return filename[last_dot_index + 1:]
+
+def get_content(file_path):
+  extension = get_file_extension(file_path)
+
+  if (extension == 'txt'):
+    # Read file txt
+    with open(file_path, mode='r') as f:
+      content = f.read()
+    return content
+  
+  if (extension == 'doc'):
+    # Read file doc
+    content = antiword.open(file_path).read()
+    return content
+
+  if (extension == 'docx'):
+    # Read file docx
+    content = docx2txt.process(file_path)
+    return content
+
+content= get_content("C:\\Users\\Phanh\\Desktop\\test.docx")
+content = remove_numbers(content)
+# print(get_file_extension('test.txt'))
+print(content)
+# print(check_unexist_french_word(content))
