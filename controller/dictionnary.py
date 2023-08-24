@@ -6,14 +6,22 @@ USERAGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_0) AppleWebKit/537.36 
 
 HEADERS = {"User-Agent": USERAGENT}
 
+# fr.m.wiktionary
+# url_definition = "https://fr.m.wiktionary.org/wiki/"
+# url_conjugaison = "https://fr.m.wiktionary.org/wiki/"
+
+# lerobert
+url_definition = "https://dictionnaire.lerobert.com/definition/"
+url_conjugaison = "https://dictionnaire.lerobert.com/conjugaison/"
+
 def check_exist_word(word):
-    print("Check word: " + word)
+    # print("Check word: " + word)
     """
     :param word: The word whose definition you are looking for
     :return: A list containing all the definitions of word
     """
     try:
-        URL = "https://dictionnaire.lerobert.com/definition/" + word.lower()
+        URL = url_definition + word.lower()
         response = req.get(URL, headers=HEADERS)
         code = response.status_code
         
@@ -36,7 +44,7 @@ def check_exist_word(word):
 
 def check_exist_verb(verb):
     try:
-        URL = "https://dictionnaire.lerobert.com/conjugaison/" + verb.lower()
+        URL = url_conjugaison + verb.lower()
         response = req.get(URL, headers=HEADERS)
         code = response.status_code
         # soup = BeautifulSoup(response.text, "html.parser")
