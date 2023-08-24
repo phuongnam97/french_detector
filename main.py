@@ -2,7 +2,6 @@ import re
 import unicodedata
 import docx2txt
 import antiword
-import math
 
 # importing sys
 import sys
