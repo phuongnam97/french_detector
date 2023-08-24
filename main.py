@@ -167,7 +167,7 @@ def has_number(word):
 
   return match is not None
 
-content = get_content("C:\\Users\\Phanh\\Desktop\\test.docx")
+content = get_content("files\\test.docx")
 content = remove_numbers(content)
 # print(get_file_extension('test.txt'))
 # print(content)
