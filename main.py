@@ -39,15 +39,28 @@ def check_unexist_french_word(paragraph):
         # print('Process: ==== ' + index / len(words) * 100 + "%")
         percent = get_percent(index, len(words))
         print("Processing: ==== " + str(percent) + "%")
-        if word == '': continue
+        if word == '' or word == '-': continue
         if has_number(word): continue
         if (word_start_with_uppercase(word) and word in proper_nouns):
           print('Proper noun: ', word)
           continue
-        existed = check_exist_word(word.lower())
+        # remove word accent
+        new_word = remove_accents(word)
+        existed = check_exist_word(new_word.lower())
         if not existed:
             not_existed_words.append(word)
     return not_existed_words
+
+def remove_accents(word):
+    """Removes accents from characters in a word, excluding dashes.
+
+    Args:
+        word: The word to remove accents from.
+
+    Returns:
+        The word without accents, keeping dashes.
+    """
+    return ''.join(c if not unicodedata.combining(c) or c == '-' else unicodedata.normalize('NFD', c)[0] for c in word)
 
 def convert_french_paper_content_to_list_of_words(paper_content):
   """Converts a French paper content to a list of words.
@@ -60,20 +73,31 @@ def convert_french_paper_content_to_list_of_words(paper_content):
   """
 
   # Remove all punctuation from the paper content.
-  newStr = paper_content.replace("S'", "").replace("L'", "").replace("l'", "").replace("s'", "").replace("n'", "").replace(" d'", " ").replace("c'", "").replace("S’", "").replace("L’", "").replace("s’", "").replace("l’", "").replace("n’", "").replace(" d’", " ").replace("c’", "").replace("\n", " ")
+  newStr = paper_content.replace("\xa0", " ").replace("aujourd'hui", "aujourd-hui").replace("S'", "").replace("L'", "").replace("l'", "").replace("s'", "").replace("n'", "").replace(" d'", " ").replace("c'", "").replace("S’", "").replace("L’", "").replace("s’", "").replace("l’", "").replace("n’", "").replace(" d’", " ").replace("c’", "").replace("\n", " ")
+  
+  # Remove accents from the paper content.
+  # print('Nam normalize NFD: ', paper_content)
+  newStr = unicodedata.normalize("NFD", newStr)
+  # print('Nam normalize NFD: ', paper_content)
+  newStr = "".join([c for c in newStr if not unicodedata.combining(c)])
+  newStr = unicodedata.normalize("NFC", newStr)
+  # print('Nam normalize NFC: ', paper_content)
+
   newStr, proper_nouns = get_proper_nouns(newStr)
-  print(newStr)
-  paper_content = re.sub(r"[^\w\s]", "", newStr)
+  print("Proper Nouns: ", proper_nouns)
+  
+  paper_content = re.sub(r"[^\w\s-]", "", newStr)
 
   # Convert the paper content to lowercase.
   # paper_content = paper_content.lower()
 
-  # Remove accents from the paper content.
-  paper_content = unicodedata.normalize("NFD", paper_content)
-  print('Nam normalize NFD: ', paper_content)
-  paper_content = "".join([c for c in paper_content if not unicodedata.combining(c)])
-  paper_content = unicodedata.normalize("NFC", paper_content)
-  print('Nam normalize NFC: ', paper_content)
+  # # Remove accents from the paper content.
+  # # print('Nam normalize NFD: ', paper_content)
+  # paper_content = unicodedata.normalize("NFD", paper_content)
+  # # print('Nam normalize NFD: ', paper_content)
+  # paper_content = "".join([c for c in paper_content if not unicodedata.combining(c)])
+  # paper_content = unicodedata.normalize("NFC", paper_content)
+  # print('Nam normalize NFC: ', paper_content)
 
   # Split the paper content into words.
   words = paper_content.split(" ")
@@ -131,7 +155,14 @@ def get_proper_nouns(text):
     # Remove space between DOT character
     # Need to detect first word of the line
     textToDetect = text.replace(". ", ".")
-    names = re.findall(r"(\b[A-Z][a-z]+\b)", textToDetect)
+    print("Nam textToDetect: ", textToDetect)
+    names1 = re.findall(r"([A-Z][a-z]+\b)", textToDetect)
+    names2 = re.findall(r"(\b[A-Z][a-z]+[A-Z][a-z]+\b)", textToDetect)
+    names3 = re.findall(r"(\b[a-z]+[A-Z][a-z]+\b)", textToDetect)
+    names4 = re.findall(r"(\b[A-Z]+\b)", textToDetect)
+
+    names = names1 + names2 + names3 + names4
+    # names = names1
 
     if names:
         print("The name is:", names)
