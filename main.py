@@ -51,6 +51,25 @@ def check_unexist_french_word(paragraph):
             not_existed_words.append(word)
     return not_existed_words
 
+def remove_urls(text):
+    """Removes all URLs from the given text."""
+    return re.sub(r"https?://\S+|www\.\S+", "", text)
+
+def remove_urls_without_www(text):
+    """Removes URLs without 'www' from the given text."""
+    return re.sub(r"\w+(\.)\w+", "", text)
+
+def remove_emails(text):
+    """Removes all email addresses from the given text."""
+    email_pattern = r"[\w\.-]+@[\w\.-]+\.\w{2,}"  # Matches common email formats
+    return re.sub(email_pattern, "", text)
+
+def remove_special_character(text):
+    """Removes all "-" from the given text."""
+    # character_pattern = r"\s-\s"  # Matches common email formats
+    # return re.sub(character_pattern, "", text)
+    return "".join(c for c in text if c != "-" or not (c == "-" and c.isspace()))
+
 def remove_accents(word):
     """Removes accents from characters in a word, excluding dashes.
 
@@ -61,6 +80,15 @@ def remove_accents(word):
         The word without accents, keeping dashes.
     """
     return ''.join(c if not unicodedata.combining(c) or c == '-' else unicodedata.normalize('NFD', c)[0] for c in word)
+
+def remove_french_special_case(text):
+   text = text.replace('J’', "").replace("j’","").replace("S’", "").replace("s’","").replace("L’", "").replace("l’", "").replace("N’", "").replace("n’", "").replace("D’", "").replace("d’", "").replace("C’", "").replace("c’", "c")
+   text = text.replace("J'", "").replace("j'","").replace("S'", "").replace("s'","").replace("L'", "").replace("l'", "").replace("N'", "").replace("n'", "").replace("D'", "").replace("d'", "").replace("C'", "").replace("c'", "c")
+   text = text.replace("\xa0", " ").replace("/", " ").replace("jusqu’a","").replace("jusqu'a","").replace("jusqu’à","").replace("jusqu'à","").replace("jusqu’aux","").replace("jusqu'aux","").replace("jusqu'en","").replace("jusqu'au","").replace("jusqu’en","").replace("jusqu’au","")
+   text = text.replace("aujourd’hui", "aujourd-hui").replace("aujourd'hui", "aujourd-hui").replace("Aujourd’hui", "aujourd-hui").replace("Aujourd'hui", "aujourd-hui")
+   text = text.replace("-t-il", "").replace("-t-elle", "")
+   text = text.replace("\n", "")
+   return text
 
 def convert_french_paper_content_to_list_of_words(paper_content):
   """Converts a French paper content to a list of words.
@@ -73,8 +101,15 @@ def convert_french_paper_content_to_list_of_words(paper_content):
   """
 
   # Remove all punctuation from the paper content.
-  newStr = paper_content.replace("\xa0", " ").replace("aujourd'hui", "aujourd-hui").replace("S'", "").replace("L'", "").replace("l'", "").replace("s'", "").replace("n'", "").replace(" d'", " ").replace("c'", "").replace("S’", "").replace("L’", "").replace("s’", "").replace("l’", "").replace("n’", "").replace(" d’", " ").replace("c’", "").replace("\n", " ")
-  
+  newStr = remove_french_special_case(paper_content)
+  newStr = remove_emails(newStr)
+  # newStr = paper_content.replace("\xa0", " ").replace("-t-il"," ").replace("-t-elle"," ").replace("/", " ").replace("jusqu’a","").replace("jusqu'a","").replace("jusqu’à","").replace("jusqu'à","").replace("jusqu’aux","").replace("jusqu'aux","").replace("jusqu'en","").replace("jusqu'au","").replace("jusqu’en","").replace("jusqu’au","").replace("aujourd’hui", "aujourd-hui").replace("aujourd'hui", "aujourd-hui").replace("J'", "").replace("j'", "").replace("S'", "").replace("L'", "").replace("l'", "").replace("s'", "").replace("n'", "").replace(" d'", " ").replace("c'", "").replace("S’", "").replace("L’", "").replace("s’", "").replace("l’", "").replace("n’", "").replace(" d’", " ").replace("c’", "").replace("\n", " ")
+  newStr = remove_urls(newStr)
+  newStr = remove_urls_without_www(newStr)
+  # newStr = remove_emails(newStr)
+
+  print("Nam newStr: ", newStr)
+
   # Remove accents from the paper content.
   # print('Nam normalize NFD: ', paper_content)
   newStr = unicodedata.normalize("NFD", newStr)
@@ -87,6 +122,7 @@ def convert_french_paper_content_to_list_of_words(paper_content):
   print("Proper Nouns: ", proper_nouns)
   
   paper_content = re.sub(r"[^\w\s-]", "", newStr)
+  paper_content = remove_french_special_case(paper_content)
 
   # Convert the paper content to lowercase.
   # paper_content = paper_content.lower()
