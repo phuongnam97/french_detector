@@ -103,10 +103,8 @@ def convert_french_paper_content_to_list_of_words(paper_content):
   # Remove all punctuation from the paper content.
   newStr = remove_french_special_case(paper_content)
   newStr = remove_emails(newStr)
-  # newStr = paper_content.replace("\xa0", " ").replace("-t-il"," ").replace("-t-elle"," ").replace("/", " ").replace("jusqu’a","").replace("jusqu'a","").replace("jusqu’à","").replace("jusqu'à","").replace("jusqu’aux","").replace("jusqu'aux","").replace("jusqu'en","").replace("jusqu'au","").replace("jusqu’en","").replace("jusqu’au","").replace("aujourd’hui", "aujourd-hui").replace("aujourd'hui", "aujourd-hui").replace("J'", "").replace("j'", "").replace("S'", "").replace("L'", "").replace("l'", "").replace("s'", "").replace("n'", "").replace(" d'", " ").replace("c'", "").replace("S’", "").replace("L’", "").replace("s’", "").replace("l’", "").replace("n’", "").replace(" d’", " ").replace("c’", "").replace("\n", " ")
   newStr = remove_urls(newStr)
   newStr = remove_urls_without_www(newStr)
-  # newStr = remove_emails(newStr)
 
   print("Nam newStr: ", newStr)
 
@@ -123,17 +121,6 @@ def convert_french_paper_content_to_list_of_words(paper_content):
   
   paper_content = re.sub(r"[^\w\s-]", "", newStr)
   paper_content = remove_french_special_case(paper_content)
-
-  # Convert the paper content to lowercase.
-  # paper_content = paper_content.lower()
-
-  # # Remove accents from the paper content.
-  # # print('Nam normalize NFD: ', paper_content)
-  # paper_content = unicodedata.normalize("NFD", paper_content)
-  # # print('Nam normalize NFD: ', paper_content)
-  # paper_content = "".join([c for c in paper_content if not unicodedata.combining(c)])
-  # paper_content = unicodedata.normalize("NFC", paper_content)
-  # print('Nam normalize NFC: ', paper_content)
 
   # Split the paper content into words.
   words = paper_content.split(" ")
