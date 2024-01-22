@@ -82,11 +82,11 @@ def remove_accents(word):
     return ''.join(c if not unicodedata.combining(c) or c == '-' else unicodedata.normalize('NFD', c)[0] for c in word)
 
 def remove_french_special_case(text):
-   text = text.replace('J’', "").replace("j’","").replace("S’", "").replace("s’","").replace("L’", "").replace("l’", "").replace("N’", "").replace("n’", "").replace("D’", "").replace("d’", "").replace("C’", "").replace("c’", "c")
-   text = text.replace("J'", "").replace("j'","").replace("S'", "").replace("s'","").replace("L'", "").replace("l'", "").replace("N'", "").replace("n'", "").replace("D'", "").replace("d'", "").replace("C'", "").replace("c'", "c")
    text = text.replace("\xa0", " ").replace("/", " ").replace("jusqu’a","").replace("jusqu'a","").replace("jusqu’à","").replace("jusqu'à","").replace("jusqu’aux","").replace("jusqu'aux","").replace("jusqu'en","").replace("jusqu'au","").replace("jusqu’en","").replace("jusqu’au","")
    text = text.replace("aujourd’hui", "aujourd-hui").replace("aujourd'hui", "aujourd-hui").replace("Aujourd’hui", "aujourd-hui").replace("Aujourd'hui", "aujourd-hui")
    text = text.replace("-t-il", "").replace("-t-elle", "")
+   text = text.replace('J’', "").replace("j’","").replace("S’", "").replace("s’","").replace("L’", "").replace("l’", "").replace("N’", "").replace("n’", "").replace("D’", "").replace("d’", "").replace("C’", "").replace("c’", "").replace("Qu’", "").replace("qu’", "")
+   text = text.replace("J'", "").replace("j'","").replace("S'", "").replace("s'","").replace("L'", "").replace("l'", "").replace("N'", "").replace("n'", "").replace("D'", "").replace("d'", "").replace("C'", "").replace("c'", "").replace("Qu'", "").replace("qu'", "")
    text = text.replace("\n", "")
    return text
 
@@ -179,10 +179,11 @@ def get_proper_nouns(text):
     # Need to detect first word of the line
     textToDetect = text.replace(". ", ".")
     print("Nam textToDetect: ", textToDetect)
-    names1 = re.findall(r"([A-Z][a-z]+\b)", textToDetect)
-    names2 = re.findall(r"(\b[A-Z][a-z]+[A-Z][a-z]+\b)", textToDetect)
-    names3 = re.findall(r"(\b[a-z]+[A-Z][a-z]+\b)", textToDetect)
-    names4 = re.findall(r"(\b[A-Z]+\b)", textToDetect)
+    pattern = r"\b(?<!-)([A-Z][a-z]+)\b(?!-)"
+    names1 = re.findall(pattern, textToDetect)                          # Case stand alone
+    names2 = re.findall(r"(\b[A-Z][a-z]+[A-Z][a-z]+\b)", textToDetect)  # Camel case
+    names3 = re.findall(r"(\b[a-z]+[A-Z][a-z]+\b)", textToDetect)       # Camel case 2
+    names4 = re.findall(r"(\b[A-Z]+\b)", textToDetect)                  # Upper case
 
     names = names1 + names2 + names3 + names4
     # names = names1
